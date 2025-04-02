@@ -12,13 +12,13 @@ public class Database {
 
     public static void add(Entity e) {
         e.id = nextId++;
-        entities.add(e);
+        entities.add(e.copy());
     }
 
     public static Entity get(int id) {
         for (Entity e : entities) {
             if (e.id == id) {
-                return e;
+                return e.copy();
             }
         }
         throw new EntityNotFoundException(id);
@@ -37,7 +37,7 @@ public class Database {
     public static void update(Entity e) {
         for (int i = 0; i < entities.size(); i++) {
             if (entities.get(i).id == e.id) {
-                entities.set(i, e);
+                entities.set(i, e.copy());
                 return;
             }
         }
