@@ -1,10 +1,8 @@
 package db;
 
-import db.exception.EntityNotFoundException;
-import db.exception.InvalidEntityException;
+import db.exception.*;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Database {
 
@@ -28,6 +26,12 @@ public class Database {
         }
 
         e.id = nextId++;
+        if (e instanceof Trackable) {
+            Date now = new Date();
+            Trackable trackable = (Trackable) e;
+            trackable.setCreationDate(now);
+            trackable.setLastModificationDate(now);
+        }
         entities.add(e.copy());
     }
     public static Entity get(int id) {
@@ -49,7 +53,15 @@ public class Database {
         throw new EntityNotFoundException("Entity not found to delete.");
     }
 
-    public static void update(Entity e) {
+    public static void update(Entity e) throws InvalidEntityException {
+        Validator validator = validators.get(e.getEntityCode());
+        if (validator != null){
+            validator.validate(e);
+        }
+        if(e instanceof Trackable) {
+            Trackable trackable = (Trackable) e;
+            trackable.setLastModificationDate(new Date());
+        }
         for (int i = 0; i < entities.size(); i++) {
             if (entities.get(i).id == e.id) {
                 entities.set(i, e.copy());
