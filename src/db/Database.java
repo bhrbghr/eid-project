@@ -4,6 +4,8 @@ import db.exception.*;
 import java.util.*;
 
 
+
+
 public class Database {
 
     private static final ArrayList<Entity> entities = new ArrayList<>();
@@ -34,6 +36,7 @@ public class Database {
         }
         entities.add(e.copy());
     }
+
     public static Entity get(int id) {
         for (Entity e : entities) {
             if (e.id == id) {
@@ -69,5 +72,16 @@ public class Database {
             }
         }
         throw new EntityNotFoundException(e.id);
+    }
+
+
+    public static ArrayList<Entity> getAll(int entityCode) {
+        ArrayList<Entity> result = new ArrayList<>();
+        for (Entity entity : entities) {
+            if (entity.getEntityCode() == entityCode) {
+                result.add(entity.copy());
+            }
+        }
+        return result;
     }
 }
