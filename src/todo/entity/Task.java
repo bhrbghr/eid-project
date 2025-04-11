@@ -1,25 +1,24 @@
 package todo.entity;
 
 import db.*;
+import db.exception.*;
 import java.util.*;
 
 public class Task extends Entity implements Trackable {
-    public static final int TASK_ENTITY_ID = 13;
     public enum Status {
-        NotStarted,
-        InProgress,
-        Completed
+        NotStarted, InProgress, Completed
     }
 
+    public static final int TASK_ENTITY_ID = 16;
     private String title;
     private String description;
     private Date dueDate;
     private Status status;
     private Date creationDate;
-    private Date lastModificationDate;
-
+    private Date lastModifiedDate;
 
     public String getTitle() {
+
         return title;
     }
 
@@ -29,6 +28,7 @@ public class Task extends Entity implements Trackable {
     }
 
     public String getDescription() {
+
         return description;
     }
 
@@ -38,6 +38,7 @@ public class Task extends Entity implements Trackable {
     }
 
     public Date getDueDate() {
+
         return dueDate;
     }
 
@@ -47,12 +48,37 @@ public class Task extends Entity implements Trackable {
     }
 
     public Status getStatus() {
+
         return status;
     }
 
     public void setStatus(Status status) {
         this.status = status;
         updateLastModified();
+    }
+
+    @Override
+    public Date getCreationDate() {
+
+        return creationDate;
+    }
+
+    @Override
+    public void setCreationDate(Date creationDate) {
+
+        this.creationDate = creationDate;
+    }
+
+    @Override
+    public Date getLastModificationDate() {
+
+        return lastModifiedDate;
+    }
+
+    @Override
+    public void setLastModificationDate(Date lastModifiedDate) {
+
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     @Override
@@ -72,30 +98,12 @@ public class Task extends Entity implements Trackable {
 
     @Override
     public int getEntityCode() {
+
         return TASK_ENTITY_ID;
     }
 
-    @Override
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    @Override
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
-
-    @Override
-    public Date getLastModificationDate() {
-        return lastModificationDate;
-    }
-
-    @Override
-    public void setLastModificationDate(Date lastModificationDate) {
-        this.lastModificationDate = lastModificationDate;
-    }
-
     private void updateLastModified() {
-        this.lastModificationDate = new Date();
+
+        this.lastModifiedDate = new Date();
     }
 }
