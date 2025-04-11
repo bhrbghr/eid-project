@@ -1,7 +1,8 @@
 package todo.validator;
+
 import db.*;
 import db.exception.*;
-import todo.entity.Task;
+import todo.entity.*;
 
 public class TaskValidator implements Validator {
     @Override

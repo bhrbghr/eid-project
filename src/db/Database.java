@@ -1,6 +1,6 @@
 package db;
-
 import db.exception.*;
+import java.io.*;
 import java.util.*;
 
 
@@ -10,15 +10,21 @@ public class Database {
 
     private static final ArrayList<Entity> entities = new ArrayList<>();
     private static final HashMap<Integer, Validator> validators = new HashMap<>();
+    private static final HashMap<Integer, Serializer> serializers = new HashMap<>();
     private static int nextId = 1;
 
     private Database() {}
 
+    public static void registerSerializer(int entityCode, Serializer serializer) {
+        serializers.put(entityCode, serializer);
+    }
+
     public static void registerValidator(int entityCode, Validator validator) {
         if (validators.containsKey(entityCode)) {
-            throw new IllegalArgumentException("Validator for this entity code already exists.");
+            throw new IllegalArgumentException("Validator already registered for this entity code");
+        } else {
+            validators.put(entityCode, validator);
         }
-        validators.put(entityCode, validator);
     }
 
     public static void add(Entity e) throws InvalidEntityException {
@@ -84,4 +90,59 @@ public class Database {
         }
         return result;
     }
+
+
+    public static void save() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("db.txt"))) {
+            for (Entity e : entities) {
+                Serializer serializer = serializers.get(e.getEntityCode());
+                if (serializer == null) continue;
+                String serializedEntity = serializer.serialize(e);
+                writer.write(e.getEntityCode() + "|" + serializedEntity);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save database.", e);
+        }
+    }
+
+    public static void load() throws IOException, ClassNotFoundException {
+        File file = new File("db.txt");
+        if (!file.exists()) {
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("\\|", 2);
+                if (parts.length != 2) continue;
+
+                int entityCode = Integer.parseInt(parts[0]);
+                String data = parts[1];
+
+                Serializer serializer = serializers.get(entityCode);
+                if (serializer != null) {
+                    Entity entity = serializer.deserialize(data);
+                    if (entity != null) {
+                        entities.add(entity.copy());
+                    }
+                }
+            }
+            updateNextId();
+        } catch (IOException | NumberFormatException | ClassNotFoundException e) {
+            System.err.println("Error while loading database: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    private static void updateNextId() {
+        for (Entity e : entities) {
+            if (e.id >= nextId) {
+                nextId = e.id + 1;
+            }
+        }
+    }
+
+
 }

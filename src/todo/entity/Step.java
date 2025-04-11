@@ -1,31 +1,20 @@
 package todo.entity;
 
 import db.*;
-import java.util.Date;
+import java.util.*;
 
 public class Step extends Entity implements Trackable {
-    public static final int STEP_ENTITY_CODE = 17;
     public enum Status {
         NotStarted,
         Completed
     }
 
-    private int taskId;
+    public static final int STEP_ENTITY_CODE = 18;
     private String title;
-    private String description;
     private Status status;
+    private int taskId;
     private Date creationDate;
     private Date lastModificationDate;
-
-
-    public int getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
-        updateLastModified();
-    }
 
     public String getTitle() {
         return title;
@@ -33,16 +22,6 @@ public class Step extends Entity implements Trackable {
 
     public void setTitle(String title) {
         this.title = title;
-        updateLastModified();
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-        updateLastModified();
     }
 
     public Status getStatus() {
@@ -51,7 +30,14 @@ public class Step extends Entity implements Trackable {
 
     public void setStatus(Status status) {
         this.status = status;
-        updateLastModified();
+    }
+
+    public int getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(int taskId) {
+        this.taskId = taskId;
     }
 
     @Override
@@ -70,9 +56,15 @@ public class Step extends Entity implements Trackable {
     }
 
     @Override
-    public void setLastModificationDate(Date lastModificationDate) {
-        this.lastModificationDate = lastModificationDate;
+    public void setLastModificationDate(Date lastModifiedAt) {
+        this.lastModificationDate = lastModifiedAt;
     }
+
+    @Override
+    public int getEntityCode() {
+        return STEP_ENTITY_CODE;
+    }
+
     @Override
     public Entity copy() {
         String titleCopy = new String(this.getTitle());
@@ -82,19 +74,10 @@ public class Step extends Entity implements Trackable {
         stepCopy.setTaskId(this.getTaskId());
         stepCopy.id = this.id;
         stepCopy.setCreationDate(new Date(creationDate.getTime()));
-        if (lastModificationDate != null) {
+        if(lastModificationDate != null){
             stepCopy.setLastModificationDate(new Date(lastModificationDate.getTime()));
+
         }
         return stepCopy;
-    }
-
-
-
-    private void updateLastModified() {
-        this.lastModificationDate = new Date();
-    }
-    @Override
-    public int getEntityCode() {
-        return STEP_ENTITY_CODE;
     }
 }
